@@ -68,11 +68,17 @@ jobs:
           },
         }
     steps:
+      - name: Setup Git
+        uses: actions/setup-git@v2
+        with:
+          user.name: ${{ github.actor }}
+          user.email: ${{ github.event.actor_email }}
+          core.autocrlf: input
+
       - name: Create default branches
         run: |
-          git config --global user.email ${{ github.event.actor_email }}
-          git config --global user.name  ${{ github.actor }}
           git init
+          git remote add origin ${{ github.event.repository.html_url }}
           git checkout -b development
           git commit -m "initial commit" --allow-empty
           git push -u origin development
