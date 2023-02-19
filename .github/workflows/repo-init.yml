@@ -75,6 +75,8 @@ jobs:
 
       - name: Create default branches
         run: |
+          echo ${REPO_OWNER}
+          echo ${REPO_NAME}
           git checkout -b development
           git push -u https://${GITHUB_TOKEN}@github.com/${REPO_OWNER}/${REPO_NAME}.git development
           git checkout -b staging
