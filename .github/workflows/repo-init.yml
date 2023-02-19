@@ -1,0 +1,57 @@
+name: Initialize Repository
+
+on:
+  workflow_dispatch:
+  create:
+    types: repository
+
+jobs:
+  create-repo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create default branches
+        run: |
+          git init
+          git checkout -b development
+          git push -u origin development
+          git checkout -b staging
+          git push -u origin staging
+          git checkout -b production
+          git push -u origin production
+
+      - name: Create branch protection (master, staging, production)
+        uses: peter-evans/branch-protection-action@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: master, staging, production
+          restricts_pushes: true
+          push_teams: "merge-managers"
+          enforce_admins: true
+          include_admins: true
+          require_status_checks: true
+          restricts_review_dismissals: true
+          dismiss_stale_reviews: true
+          require_pull_request_reviews: true
+          required_pull_request_reviews_approving_count: 2
+          required_pull_request_review_dismissal_restrictions: true
+          require_merge_method: true
+          allow_merge_commit: false
+          allow_rebase_merge: true
+          allow_squash_merge: true
+
+      - name: Create branch protection (development, release/*)
+        uses: peter-evans/branch-protection-action@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: development, release/[0-9]*.[0-9]*.[0-9]*
+          restricts_pushes: true
+          push_teams: "merge-managers"
+          enforce_admins: true
+          include_admins: true
+          require_status_checks: true
+          restrict_review_dismissals: true
+          dismiss_stale_reviews: true
+          require_pull_request_reviews: true
+          required_pull_request_reviews_approving_count: 1
+          required_pull_request_review_dismissal_restrictions: true
