@@ -72,6 +72,7 @@ jobs:
         run: |
           git init
           git checkout -b development
+          git commit -m "initial commit" --allow-empty
           git push -u origin development
           git checkout -b staging
           git push -u origin staging
