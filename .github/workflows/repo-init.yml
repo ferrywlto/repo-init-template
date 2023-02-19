@@ -70,6 +70,9 @@ jobs:
     steps:
       - name: Create default branches
         run: |
+          git config --global init.defaultBranch main
+          git config --global user.email ${{ github.event.sender.email }}
+          git config --global user.name  ${{ github.actor }}
           git init
           git checkout -b development
           git commit -m "initial commit" --allow-empty
