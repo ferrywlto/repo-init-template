@@ -77,6 +77,8 @@ jobs:
         run: |
           echo ${REPO_OWNER}
           echo ${REPO_NAME}
+          git config --local user.email "ferrywlto@gmail.com"
+          git config --local user.name "Ferry To"
           git checkout -b development
           git push -u https://${GITHUB_TOKEN}@github.com/${REPO_NAME}.git development
           git checkout -b staging
