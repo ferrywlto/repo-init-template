@@ -75,10 +75,7 @@ jobs:
 
       - name: Create default branches
         run: |
-          git init
-          git remote add origin ${{ github.event.repository.html_url }}
           git checkout -b development
-          git commit -m "initial commit" --allow-empty
           git push -u origin development
           git checkout -b staging
           git push -u origin staging
