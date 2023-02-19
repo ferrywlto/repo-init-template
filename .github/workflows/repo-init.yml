@@ -69,11 +69,9 @@ jobs:
         }
     steps:
       - name: Setup Git
-        uses: actions/setup-git@v2
+        uses: actions/checkout@v3
         with:
-          user.name: ${{ github.actor }}
-          user.email: ${{ github.event.actor_email }}
-          core.autocrlf: input
+          fetch-depth: 0
 
       - name: Create default branches
         run: |
