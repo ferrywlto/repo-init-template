@@ -70,7 +70,6 @@ jobs:
     steps:
       - name: Create default branches
         run: |
-          git config --global init.defaultBranch main
           git config --global user.email ${{ github.event.actor_email }}
           git config --global user.name  ${{ github.actor }}
           git init
