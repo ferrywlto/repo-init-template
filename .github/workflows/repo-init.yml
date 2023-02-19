@@ -70,7 +70,6 @@ jobs:
     steps:
       - name: Create default branches
         run: |
-          git init
           git checkout -b development
           git push -u origin development
           git checkout -b staging
@@ -78,10 +77,10 @@ jobs:
           git checkout -b production
           git push -u origin production
 
-      - name: Create branch protection (master)
+      - name: Create branch protection (main)
         run: |
           curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER -d $STRICT_RULE \
-          https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/branches/master/protection
+          https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/branches/main/protection
 
       - name: Create branch protection (staging)
         run: |
