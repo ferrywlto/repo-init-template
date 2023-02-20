@@ -15,4 +15,4 @@ jobs:
           echo "::set-output name=user_profile_url::$user_url"
           
       - run: |
-          echo ${{ steps.user_profile_url.user_profile_url }}
+          echo ${{ steps.user_profile_url.outputs.user_profile_url }}
