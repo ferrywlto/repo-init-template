@@ -14,13 +14,15 @@ jobs:
       - name: Get commit info
         id: get-commit-info
         run: |
+          FULL_NAME=$(git show -s --format='%an' ${{ github.sha }})
           COMMIT_INFO=$(git log -1 --pretty=format:'%h %ae' $GITHUB_SHA)
           COMMIT_SHA=$(echo $COMMIT_INFO | awk '{print $1}')
           COMMIT_EMAIL=$(echo $COMMIT_INFO | awk '{print $2}')
           echo $COMMIT_INFO
           echo "commit-sha=${COMMIT_SHA}" >> $GITHUB_OUTPUT
           echo "commit-email=${COMMIT_EMAIL}" >> $GITHUB_OUTPUT
+          echo "full-name=${FULL_NAME}" >> $GITHUB_OUTPUT
 
       - name: Print
         run: |
-          echo "Commit ${{ steps.get-commit-info.outputs.commit-sha }} is from ${{ steps.get-commit-info.outputs.commit-email }}"
+          echo "Commit ${{ steps.get-commit-info.outputs.commit-sha }} is from ${{steps.get-commit-info.outputs.full-name}}(${{ steps.get-commit-info.outputs.commit-email }})"
