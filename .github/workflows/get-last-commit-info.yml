@@ -25,4 +25,4 @@ jobs:
 
       - name: Print
         run: |
-          echo "Commit ${{ steps.get-commit-info.commit-sha }} is from ${{ steps.get-commit-info.commit-email }}"
+          echo "Commit ${{ steps.get-commit-info.outputs.commit-sha }} is from ${{ steps.get-commit-info.outputs.commit-email }}"
