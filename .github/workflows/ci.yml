@@ -2,7 +2,7 @@ name: Continuous Integration (Build, Test, Lint)
 
 env:
   CI: true
-  SLACK_BOT_TOKEN: ${{ vars.SLACK_BOT_TOKEN }}
+  SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
   SLACK_CHANNEL: 'ci-failures'
   REPO_NAME: ${{ github.repository }}
   REPO_URL: ${{ github.event.repository.html_url }}
@@ -34,8 +34,9 @@ jobs:
           COMMIT_INFO=$(git log -1 --pretty=format:'%h %ae' $GITHUB_SHA)
           COMMIT_SHA=$(echo $COMMIT_INFO | awk '{print $1}')
           COMMIT_EMAIL=$(echo $COMMIT_INFO | awk '{print $2}')
+          echo $COMMIT_SHA
+          echo ${{ github.sha }}
           echo "commit-sha=${COMMIT_SHA}" >> $GITHUB_OUTPUT
-          echo "commit-email=${COMMIT_EMAIL}" >> $GITHUB_OUTPUT
           echo "full-name=${FULL_NAME}" >> $GITHUB_OUTPUT
 
       - name: Get user profile URL
@@ -55,11 +56,11 @@ jobs:
           function generate_message() {
             local message="{\
                 \"channel\": \"$SLACK_CHANNEL\",\
-                \"text\": \"<!here> Continuous integration failure from <$PULL_REQUEST_URL|$PULL_REQUEST_TITLE>\
-                triggered by <${{ steps.user_profile_url.outputs.user_profile_url }}|${{steps.get-commit-info.outputs.full-name}}(${{ steps.get-commit-info.outputs.commit-email }}>\\n\
+                \"text\": \"<!here> Continuous integration failure triggered by \
+                <${{ steps.user_profile_url.outputs.user_profile_url }}|${{steps.get-commit-info.outputs.full-name}}>\\n\
                 Repository: <$REPO_URL|$REPO_NAME>\\n\
-                Source Branch: $SOURCE_BRANCH\\n\
-                Target Branch: $TARGET_BRANCH\\n\
+                Pull Request: <$PULL_REQUEST_URL|$PULL_REQUEST_TITLE>\\n\
+                Commit: <$REPO_URL/commit/$COMMIT_SHA|$COMMIT_SHA>\\n\
                 Reason: $1\"\
             }"
             echo $message
