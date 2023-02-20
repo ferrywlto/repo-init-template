@@ -32,3 +32,11 @@ jobs:
           ${{ github.event.pull_request.head.user.name }}<${{ github.event.pull_request.head.user.email }}>"
 
 
+      - name: Extract author name from pull request
+        run: |
+          result=$(curl -s \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          $(https://api.github.com/repos/${{ github.repository }}/commits/${{ github.event.pull_request.head.sha }})
+          echo ${result}
+        
+        
