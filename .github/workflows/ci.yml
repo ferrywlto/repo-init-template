@@ -84,7 +84,7 @@ jobs:
                 \"text\": \"<!here>\\n Continuous integration failure triggered by \
                 <${{ steps.last-commit-user-info.outputs.profile-url }}|${{ steps.last-commit-user-info.outputs.full-name }}>\\n\
                 Repository: <${{ github.event.repository.html_url }}|${{ github.repository }}>\\n\
-                Pull Request: <${{ github.event.pull_request.html_url }}|${{ github.event.pull_request.html_url }}>\\n\
+                Pull Request: <${{ github.event.pull_request.html_url }}|${{ github.event.pull_request.title }}>\\n\
                 Commit: <${{ steps.last-commit-user-info.outputs.commit-url }}|${{ github.sha }}>\\n\
                 Reason: $1\"\
             }"
