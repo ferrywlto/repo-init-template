@@ -82,7 +82,7 @@ jobs:
         if: ${{ failure() }}
         run: |
           curl --location --request POST \
-          --header 'Authorization: Bearer ${SLACK_BOT_TOKEN}' \
+          --header 'Authorization: Bearer $SLACK_BOT_TOKEN' \
           --header 'Content-type: application/json; charset=utf-8' \
           --data-raw '${{ steps.slack-message.outputs.message-issue-build }}' \
           https://slack.com/api/chat.postMessage
