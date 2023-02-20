@@ -13,7 +13,8 @@ env:
 
 on:
   workflow_dispatch:
-
+  pull_request:
+  
 jobs:
   continuous-integration:
     name: Continuous Integration
@@ -24,12 +25,14 @@ jobs:
         id: slack-message
         run: |
           function generate_message() {
-            local message="{ \"text\":\"<!here> CI Failure from <$PULL_REQUEST_URL|pull request> triggered by $TRIGGERED_BY \n \
+            local message="{ \
+            \"channel\": \"$SLACK_CHANNEL\" \
+            \"text\":\"<!here> CI Failure from <$PULL_REQUEST_URL|pull request> triggered by $TRIGGERED_BY \n \
             Repository: $REPO_NAME\n \
             Source Branch: $SOURCE_BRANCH\n \
             Target Branch: $TARGET_BRANCH\n \
             Reason: $1 \"}"
-            echo "::set-output name=message::$message"
+            echo "message=$message" >> $GITHUB_OUTPUT
           }
           
       - name: Checkout code
