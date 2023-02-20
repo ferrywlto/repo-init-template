@@ -9,9 +9,11 @@ jobs:
         id: user_profile_url
         run: |
           pr_number=${{ github.event.number }}
+          echo ${pr_number}
           response=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/pulls/${pr_number}")
           user_url=$(echo "$response" | jq -r '.user.url')
+          echo ${user_url}
           echo "::set-output name=user_profile_url::$user_url"
           
       - run: |
