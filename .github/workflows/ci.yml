@@ -7,6 +7,7 @@ env:
   REPO_NAME: ${{ github.repository }}
   REPO_URL: ${{ github.event.repository.html_url }}
   PULL_REQUEST_URL: ${{ github.event.pull_request.html_url }}
+  PULL_REQUEST_TITLE: ${{ github.event.pull_request.title }}
   SOURCE_BRANCH: ${{ github.event.before }}
   TARGET_BRANCH: ${{ github.event.after }}
   TRIGGERED_BY: ${{ github.actor }}
@@ -21,14 +22,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          
+      - name: Get commit info
+        id: get-commit-info
+        run: |
+          FULL_NAME=$(git show -s --format='%an' ${{ github.sha }})
+          COMMIT_INFO=$(git log -1 --pretty=format:'%h %ae' $GITHUB_SHA)
+          COMMIT_SHA=$(echo $COMMIT_INFO | awk '{print $1}')
+          COMMIT_EMAIL=$(echo $COMMIT_INFO | awk '{print $2}')
+          echo "commit-sha=${COMMIT_SHA}" >> $GITHUB_OUTPUT
+          echo "commit-email=${COMMIT_EMAIL}" >> $GITHUB_OUTPUT
+          echo "full-name=${FULL_NAME}" >> $GITHUB_OUTPUT
+
+      - name: Get user profile URL
+        id: user_profile_url
+        run: |
+          response=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" $PULL_REQUEST_URL)
+          user_url=$(echo "$response" | jq -r '.user.url')
+          echo "user_profile_url=${user_url}" >> $GITHUB_OUTPUT
+          
       - name: Setup message function
         id: slack-message
         run: |
           function generate_message() {
             local message="{\
                 \"channel\": \"$SLACK_CHANNEL\",\
-                \"text\": \"<!here> CI Failure from <$PULL_REQUEST_URL|pull request> triggered by $TRIGGERED_BY\\n\
-                Repository: $REPO_NAME\\n\
+                \"text\": \"<!here> Continuous integration failure from <$PULL_REQUEST_URL|$PULL_REQUEST_TITLE>\
+                triggered by <${{ steps.user_profile_url.outputs.user_profile_url }}|${{steps.get-commit-info.outputs.full-name}}(${{ steps.get-commit-info.outputs.commit-email }}>\\n\
+                Repository: <$REPO_URL|$REPO_NAME>\\n\
                 Source Branch: $SOURCE_BRANCH\\n\
                 Target Branch: $TARGET_BRANCH\\n\
                 Reason: $1\"\
@@ -46,11 +71,6 @@ jobs:
           echo ${{ steps.slack-message.outputs.message-issue-build }}
           echo ${{ steps.slack-message.outputs.message-issue-test }}
           echo ${{ steps.slack-message.outputs.message-issue-quality }}
-          
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
           
       - name: Setup .NET
         uses: actions/setup-dotnet@v2.0.0
