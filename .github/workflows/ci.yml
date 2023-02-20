@@ -34,10 +34,15 @@ jobs:
             Reason: $1 \"}"
             echo $message
           }
-          echo $(generate_message "Build failed")
+          echo "message-issue-build=$(generate_message "Build failed")" >> $GITHUB_OUTPUT
+          echo "message-issue-test=$(generate_message "Unit tests broken")" >> $GITHUB_OUTPUT
+          echo "message-issue-quality=$(generate_message "Code quality issues")" >> $GITHUB_OUTPUT
+          
       - name: verify works in next step
         run: |
-          echo $(generate_message "Build failed")
+          echo ${{ steps.slack-message.outputs.message-issue-build }}
+          echo ${{ steps.slack-message.outputs.message-issue-test }}
+          echo ${{ steps.slack-message.outputs.message-issue-quality }}
           
       - name: Checkout code
         uses: actions/checkout@v3
@@ -60,7 +65,7 @@ jobs:
           curl -X POST \
           -H 'Authorization: Bearer $SLACK_BOT_TOKEN' \
           -H 'Content-type: application/json; charset=utf-8' \
-          --data '$(generate_message "Build failed")' \
+          --data '${{ steps.slack-message.outputs.message-issue-build }}' \
           https://slack.com/api/chat.postMessage
           
 #      - name: Run unit tests
