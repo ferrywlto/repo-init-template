@@ -17,11 +17,9 @@ jobs:
           COMMIT_INFO=$(git log -1 --pretty=format:'%h %ae' $GITHUB_SHA)
           COMMIT_SHA=$(echo $COMMIT_INFO | awk '{print $1}')
           COMMIT_EMAIL=$(echo $COMMIT_INFO | awk '{print $2}')
+          echo $COMMIT_INFO
           echo "commit-sha=${COMMIT_SHA}" >> $GITHUB_OUTPUT
           echo "commit-email=${COMMIT_EMAIL}" >> $GITHUB_OUTPUT
-        env:
-          COMMIT_SHA: $COMMIT_SHA
-          COMMIT_EMAIL: $COMMIT_EMAIL
 
       - name: Print
         run: |
