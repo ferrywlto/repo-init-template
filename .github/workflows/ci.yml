@@ -65,6 +65,7 @@ jobs:
             echo $message
           }
           echo "message-issue-build=$(generate_message "Build failed")" >> $GITHUB_OUTPUT
+          echo "message-issue-docker=$(generate_message "Docker build failed")" >> $GITHUB_OUTPUT
           echo "message-issue-test=$(generate_message "Unit tests broken")" >> $GITHUB_OUTPUT
           echo "message-issue-quality=$(generate_message "Code quality issues")" >> $GITHUB_OUTPUT
           
@@ -86,7 +87,26 @@ jobs:
           --header 'Content-type: application/json; charset=utf-8' \
           --data-raw '${{ steps.slack-message.outputs.message-issue-build }}' \
           https://slack.com/api/chat.postMessage
+        
+#      - name: Setup Docker Buildx
+#        uses: docker/setup-buildx-action@v2
+#        with:
+#          version: latest
+#        
+#      - name: Build docker image
+#        run: |
+#          docker build -t ${{ env.REPO_NAME }}:${{ steps.get-commit-info.outputs.commit-sha }} .
+#        
+#      - name: Notify Slack on docker build failure
+#        if: ${{ failure() }}
+#        run: |
+#          curl --location --request POST \
+#          --header 'Authorization: Bearer ${{ env.SLACK_BOT_TOKEN }}' \
+#          --header 'Content-type: application/json; charset=utf-8' \
+#          --data-raw '${{ steps.slack-message.outputs.message-issue-docker }}' \
+#          https://slack.com/api/chat.postMessage
           
+#      Resume unit tests and code quality analysis when they are ready
 #      - name: Run unit tests
 #        run: |
 #          dotnet test
@@ -94,11 +114,11 @@ jobs:
 #      - name: Notify Slack on unit test failure
 #        if: ${{ failure() }}
 #        run: |
-#          curl -X POST \
-#          -H 'Authorization: Bearer $SLACK_BOT_TOKEN' \
-#          -H 'Content-type: application/json' \
-#          --data '$(generate_message "Unit tests broken")' \
-#          https://slack.com/api/chat.postMessage?channel=$SLACK_CHANNEL
+#          curl --location --request POST \
+#          --header 'Authorization: Bearer ${{ env.SLACK_BOT_TOKEN }}' \
+#          --header 'Content-type: application/json; charset=utf-8' \
+#          --data-raw '${{ steps.slack-message.outputs.message-issue-test }}' \
+#          https://slack.com/api/chat.postMessage
 #      
 #      - name: Code Quality Analysis
 #        uses: JetBrains/qodana-action@main
@@ -110,8 +130,8 @@ jobs:
 #      - name: Notify Slack on code quality failure
 #        if: ${{ failure() }}
 #        run: |
-#          curl -X POST \
-#          -H 'Authorization: Bearer $SLACK_BOT_TOKEN' \
-#          -H 'Content-type: application/json' \
-#          --data '$(generate_message "Code quality issues")' \
-#          https://slack.com/api/chat.postMessage?channel=$SLACK_CHANNEL
+#          curl --location --request POST \
+#          --header 'Authorization: Bearer ${{ env.SLACK_BOT_TOKEN }}' \
+#          --header 'Content-type: application/json; charset=utf-8' \
+#          --data-raw '${{ steps.slack-message.outputs.message-issue-quality }}' \
+#          https://slack.com/api/chat.postMessage
