@@ -56,7 +56,7 @@ jobs:
           echo $response
           
           # Extract the author login from the response using jq
-          author_name=$(echo $response | jq -r '.author.name')
+          author_name=$(echo $response | jq -r '.commit.author.name')
           author_login=$(echo $response | jq -r '.author.login')
           echo $author_name
           echo $author_login
