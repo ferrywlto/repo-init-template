@@ -49,13 +49,33 @@ jobs:
           echo ${{ github.event.pull_request.html_url }}
           echo "user_profile_url=${user_url}" >> $GITHUB_OUTPUT
 
+      - name: Get last commit info 2
+        run: |
+          # Get the commit details using the GitHub REST API
+          response=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$REPO_NAME/commits/${{ github.sha }})
+
+          # Extract the author login from the response using jq
+          author_name=$(echo $response | jq -r '.author.name')
+          author_login=$(echo $response | jq -r '.author.login')
+          echo $author_name
+          echo $author_login
+          
+          # Get the user details using the GitHub REST API
+          user_response=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/users/${author_login})
+
+          # Extract the profile URL from the user response using jq
+          profile_url=$(echo $user_response | jq -r '.html_url')
+
+          # Print the profile URL to the console
+          echo $profile_url
+          
       - name: Setup message function
         id: slack-message
         run: |
           function generate_message() {
             local message="{\
                 \"channel\": \"$SLACK_CHANNEL\",\
-                \"text\": \"<!here>\\nContinuous integration failure triggered by \
+                \"text\": \"<!here>\\n Continuous integration failure triggered by \
                 <${{ steps.user_profile_url.outputs.user_profile_url }}|${{steps.get-commit-info.outputs.full-name}}>\\n\
                 Repository: <$REPO_URL|$REPO_NAME>\\n\
                 Pull Request: <$PULL_REQUEST_URL|$PULL_REQUEST_TITLE>\\n\
