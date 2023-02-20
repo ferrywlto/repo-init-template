@@ -27,6 +27,9 @@ jobs:
         with:
           fetch-depth: 0
           
+      - name: Test printing your secret (Remove this step in production)
+        run: cat $HOME/secrets/my_secret.json
+        
       - name: Get commit info
         id: get-commit-info
         run: |
