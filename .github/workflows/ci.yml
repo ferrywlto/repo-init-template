@@ -55,7 +55,8 @@ jobs:
           function generate_message() {
             local message="{\
                 \"channel\": \"$SLACK_CHANNEL\",\
-                \"text\": \"<!here> Continuous integration failure triggered by \
+                \"text\": \"<!here>\\n\ 
+                Continuous integration failure triggered by \
                 <${{ steps.user_profile_url.outputs.user_profile_url }}|${{steps.get-commit-info.outputs.full-name}}>\\n\
                 Repository: <$REPO_URL|$REPO_NAME>\\n\
                 Pull Request: <$PULL_REQUEST_URL|$PULL_REQUEST_TITLE>\\n\
