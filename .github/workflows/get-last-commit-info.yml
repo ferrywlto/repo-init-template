@@ -26,3 +26,11 @@ jobs:
       - name: Print
         run: |
           echo "Commit ${{ steps.get-commit-info.outputs.commit-sha }} is from ${{steps.get-commit-info.outputs.full-name}}(${{ steps.get-commit-info.outputs.commit-email }})"
+
+      - name: Get commit author name and email
+        run: |
+          author_name="${{ github.event.head_commit.author.name }}"
+          author_email="${{ github.event.head_commit.author.email }}"
+          commit_sha="${{ github.sha }}"
+          echo "Commit author: $author_name <$author_email>"
+          echo "Commit SHA: $commit_sha"
