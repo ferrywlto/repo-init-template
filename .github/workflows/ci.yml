@@ -1,0 +1,90 @@
+name: Continuous Integration (Build, Test, Lint) 
+
+env:
+  CI: true
+  SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+  SLACK_CHANNEL: '#ci-failures'
+  REPO_NAME: ${{ github.repository }}
+  REPO_URL: ${{ github.event.repository.html_url }}
+  PULL_REQUEST_URL: ${{ github.event.pull_request.html_url }}
+  SOURCE_BRANCH: ${{ github.event.before }}
+  TARGET_BRANCH: ${{ github.event.after }}
+  TRIGGERED_BY: ${{ github.actor }}
+
+on:
+  workflow_dispatch:
+  pull_request:
+  
+jobs:
+  continuous-integration:
+    name: Continuous Integration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup message function
+        id: slack-message
+        run: |
+          function generate_message() {
+            local message="{ \
+            \"channel\": \"$SLACK_CHANNEL\" \
+            \"text\":\"<!here> CI Failure from <$PULL_REQUEST_URL|pull request> triggered by $TRIGGERED_BY \n \
+            Repository: $REPO_NAME\n \
+            Source Branch: $SOURCE_BRANCH\n \
+            Target Branch: $TARGET_BRANCH\n \
+            Reason: $1 \"}"
+            echo "message=$message" >> $GITHUB_OUTPUT
+          }
+          
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2.0.0
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Build dotnet code
+        run: |
+          dotnet restore
+          dotnet build --no-restore --configuration Release
+          
+      - name: Notify Slack on build failure
+        if: ${{ failure() }}
+        run: |
+          echo $(generate_message "Build failed")
+          curl -X POST \
+          -H 'Authorization: Bearer $SLACK_BOT_TOKEN' \
+          -H 'Content-type: application/json; charset=utf-8' \
+          --data '$(generate_message "Build failed")' \
+          https://slack.com/api/chat.postMessage
+          
+#      - name: Run unit tests
+#        run: |
+#          dotnet test
+#
+#      - name: Notify Slack on unit test failure
+#        if: ${{ failure() }}
+#        run: |
+#          curl -X POST \
+#          -H 'Authorization: Bearer $SLACK_BOT_TOKEN' \
+#          -H 'Content-type: application/json' \
+#          --data '$(generate_message "Unit tests broken")' \
+#          https://slack.com/api/chat.postMessage?channel=$SLACK_CHANNEL
+#      
+#      - name: Code Quality Analysis
+#        uses: JetBrains/qodana-action@main
+#        env:
+#          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+#        with:
+#          args: --baseline,qodana.sarif.json
+#
+#      - name: Notify Slack on code quality failure
+#        if: ${{ failure() }}
+#        run: |
+#          curl -X POST \
+#          -H 'Authorization: Bearer $SLACK_BOT_TOKEN' \
+#          -H 'Content-type: application/json' \
+#          --data '$(generate_message "Code quality issues")' \
+#          https://slack.com/api/chat.postMessage?channel=$SLACK_CHANNEL

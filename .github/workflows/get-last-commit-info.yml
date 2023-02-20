@@ -1,0 +1,42 @@
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  get-git-info:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Git
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get commit info
+        id: get-commit-info
+        run: |
+          FULL_NAME=$(git show -s --format='%an' ${{ github.sha }})
+          COMMIT_INFO=$(git log -1 --pretty=format:'%h %ae' $GITHUB_SHA)
+          COMMIT_SHA=$(echo $COMMIT_INFO | awk '{print $1}')
+          COMMIT_EMAIL=$(echo $COMMIT_INFO | awk '{print $2}')
+          echo $COMMIT_INFO
+          echo "commit-sha=${COMMIT_SHA}" >> $GITHUB_OUTPUT
+          echo "commit-email=${COMMIT_EMAIL}" >> $GITHUB_OUTPUT
+          echo "full-name=${FULL_NAME}" >> $GITHUB_OUTPUT
+
+      - name: Print
+        run: |
+          echo "Commit ${{ steps.get-commit-info.outputs.commit-sha }} is from ${{steps.get-commit-info.outputs.full-name}}(${{ steps.get-commit-info.outputs.commit-email }})"
+      - name: Extract author name from pull request
+        run: |
+          echo "Author: ${{ github.event.pull_request.head.sha }} \
+          ${{ github.event.pull_request.head.user.name }}<${{ github.event.pull_request.head.user.email }}>"
+
+
+      - name: Extract author name from pull request
+        run: |
+          result=$(curl -s \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          https://api.github.com/repos/${{ github.repository }}/commits/${{ github.event.pull_request.head.sha }})
+          echo ${result}
+        
+        
