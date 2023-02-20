@@ -53,7 +53,8 @@ jobs:
         run: |
           # Get the commit details using the GitHub REST API
           response=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/$REPO_NAME/commits/${{ github.sha }})
-
+          echo $response
+          
           # Extract the author login from the response using jq
           author_name=$(echo $response | jq -r '.author.name')
           author_login=$(echo $response | jq -r '.author.login')
