@@ -25,15 +25,17 @@ jobs:
         id: slack-message
         run: |
           function generate_message() {
-            local message='{ 
+            local message=$(cat <<EOF
+            {
                 "channel": "$SLACK_CHANNEL",
-                "text": "<!here> CI Failure from <$PULL_REQUEST_URL|pull request> triggered by $TRIGGERED_BY\\n \
-                Repository: $REPO_NAME\\n \
-                Source Branch: $SOURCE_BRANCH\\n \
-                Target Branch: $TARGET_BRANCH\\n \
+                "text": "<!here> CI Failure from <$PULL_REQUEST_URL|pull request> triggered by $TRIGGERED_BY\n 
+                Repository: $REPO_NAME\n
+                Source Branch: $SOURCE_BRANCH\n
+                Target Branch: $TARGET_BRANCH\n
                 Reason: $1"
-            }'
-
+            }
+            EOF
+            )
             echo $message
           }
           echo "message-issue-build=$(generate_message "Build failed")" >> $GITHUB_OUTPUT
