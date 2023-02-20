@@ -1,0 +1,16 @@
+on:
+  workflow_dispatch:
+
+job:
+  get-git-info:
+  
+  - use: actions/checkout@v3
+  
+  - name: Get commit info
+  run: |
+    COMMIT_INFO=$(git log -1 --pretty=format:'%h %ae' $GITHUB_SHA)
+    COMMIT_SHA=$(echo $COMMIT_INFO | awk '{print $1}')
+    COMMIT_EMAIL=$(echo $COMMIT_INFO | awk '{print $2}')
+  env:
+    COMMIT_SHA: $COMMIT_SHA
+    COMMIT_EMAIL: $COMMIT_EMAIL
