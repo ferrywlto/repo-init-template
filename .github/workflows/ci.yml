@@ -40,7 +40,8 @@ jobs:
           
       - name: verify works in next step
         run: |
-          echo ${{ github.event.pull_request.head }}
+          echo $SLACK_BOT_TOKEN
+          echo "${{ github.event.pull_request.head }}"
           echo ${{ steps.slack-message.outputs.message-issue-build }}
           echo ${{ steps.slack-message.outputs.message-issue-test }}
           echo ${{ steps.slack-message.outputs.message-issue-quality }}
