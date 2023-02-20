@@ -32,8 +32,12 @@ jobs:
             Source Branch: $SOURCE_BRANCH\n \
             Target Branch: $TARGET_BRANCH\n \
             Reason: $1 \"}"
-            echo "message=$message" >> $GITHUB_OUTPUT
+            echo $message
           }
+          echo $(generate_message "Build failed")
+      - name: verify works in next step
+        run: |
+          echo $(generate_message "Build failed")
           
       - name: Checkout code
         uses: actions/checkout@v3
@@ -53,7 +57,6 @@ jobs:
       - name: Notify Slack on build failure
         if: ${{ failure() }}
         run: |
-          echo $(generate_message "Build failed")
           curl -X POST \
           -H 'Authorization: Bearer $SLACK_BOT_TOKEN' \
           -H 'Content-type: application/json; charset=utf-8' \
