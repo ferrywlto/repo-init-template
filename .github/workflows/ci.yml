@@ -54,17 +54,20 @@ jobs:
         run: |
           # Get the commit details using the GitHub REST API
           response=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/${{ github.repository }}/commits/${{ github.sha }})
+          echo $response
           
           # Extract the author login from the response using jq
           author_name=$(echo $response | jq -r '.commit.author.name')
           commit_url=$(echo $response | jq -r '.html_url')
+          
           echo "full-name=${author_name}" >> $GITHUB_OUTPUT
-          echo "commit-url=${author_name}" >> $GITHUB_OUTPUT
+          echo "commit-url=${commit_url}" >> $GITHUB_OUTPUT
           
           author_login=$(echo $response | jq -r '.author.login')
           
           # Get the user details using the GitHub REST API
           user_response=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/users/${author_login})
+          echo $user_response
 
           # Extract the profile URL from the user response using jq
           profile_url=$(echo $user_response | jq -r '.html_url')
