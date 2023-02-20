@@ -10,9 +10,9 @@ jobs:
         run: |
           pr_number=${{ github.event.number }}
           echo ${pr_number}
-          pr_url = "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.number }}"
+          pr_url = "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number"
           echo ${pr_url}
-          response=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" $pr_url)
+          response=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" ${pr_url})
           user_url=$(echo "$response" | jq -r '.user.url')
           echo ${response}
           echo "user_profile_url=${user_url}" >> $GITHUB_OUTPUT
