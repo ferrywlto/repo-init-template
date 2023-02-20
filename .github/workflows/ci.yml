@@ -53,11 +53,12 @@ jobs:
       - name: Notify Slack on build failure
         if: ${{ failure() }}
         run: |
+          echo $(generate_message "Build failed")
           curl -X POST \
           -H 'Authorization: Bearer $SLACK_BOT_TOKEN' \
           -H 'Content-type: application/json' \
           --data '$(generate_message "Build failed")' \
-          https://slack.com/api/chat.postMessage?channel=$SLACK_CHANNEL
+          https://slack.com/api/chat.postMessage
           
 #      - name: Run unit tests
 #        run: |
