@@ -61,7 +61,7 @@ jobs:
           echo $author_name
           echo $author_login
           
-          # Get the user details using the GitHub REST API
+          # Get the user details using the GitHub REST API 2
           user_response=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/users/${author_login})
 
           # Extract the profile URL from the user response using jq
