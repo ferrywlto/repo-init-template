@@ -2,8 +2,8 @@ name: Continuous Integration (Build, Test, Lint)
 
 env:
   CI: true
-  SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-  SLACK_CHANNEL: '#ci-failures'
+  SLACK_BOT_TOKEN: ${{ vars.SLACK_BOT_TOKEN }}
+  SLACK_CHANNEL: 'ci-failures'
   REPO_NAME: ${{ github.repository }}
   REPO_URL: ${{ github.event.repository.html_url }}
   PULL_REQUEST_URL: ${{ github.event.pull_request.html_url }}
@@ -25,15 +25,20 @@ jobs:
         id: slack-message
         run: |
           function generate_message() {
-            local message="{ \
-            \"channel\": \"$SLACK_CHANNEL\" \
-            \"text\":\"<!here> CI Failure from <$PULL_REQUEST_URL|pull request> triggered by $TRIGGERED_BY \n \
-            Repository: $REPO_NAME\n \
-            Source Branch: $SOURCE_BRANCH\n \
-            Target Branch: $TARGET_BRANCH\n \
-            Reason: $1 \"}"
-            echo "message=$message" >> $GITHUB_OUTPUT
+            local message='{ "channel": "$SLACK_CHANNEL", "text": "<!here> CI Failure from <$PULL_REQUEST_URL|pull request> triggered by $TRIGGERED_BY\n Repository: $REPO_NAME\n Source Branch: $SOURCE_BRANCH\n Target Branch: $TARGET_BRANCH\n Reason: $1" }'
+            echo $message
           }
+          echo "message-issue-build=$(generate_message "Build failed")" >> $GITHUB_OUTPUT
+          echo "message-issue-test=$(generate_message "Unit tests broken")" >> $GITHUB_OUTPUT
+          echo "message-issue-quality=$(generate_message "Code quality issues")" >> $GITHUB_OUTPUT
+          
+      - name: verify works in next step
+        run: |
+          echo $SLACK_BOT_TOKEN
+          echo "${{ github.event.pull_request.head }}"
+          echo ${{ steps.slack-message.outputs.message-issue-build }}
+          echo ${{ steps.slack-message.outputs.message-issue-test }}
+          echo ${{ steps.slack-message.outputs.message-issue-quality }}
           
       - name: Checkout code
         uses: actions/checkout@v3
@@ -53,11 +58,10 @@ jobs:
       - name: Notify Slack on build failure
         if: ${{ failure() }}
         run: |
-          echo $(generate_message "Build failed")
-          curl -X POST \
-          -H 'Authorization: Bearer $SLACK_BOT_TOKEN' \
-          -H 'Content-type: application/json; charset=utf-8' \
-          --data '$(generate_message "Build failed")' \
+          curl --location --request POST \
+          --header 'Authorization: Bearer xoxb-78303565042-4436024514775-jzkZ2GWcrS3juDrX8uu1EqUP' \
+          --header 'Content-type: application/json; charset=utf-8' \
+          --data-raw '${{ steps.slack-message.outputs.message-issue-build }}' \
           https://slack.com/api/chat.postMessage
           
 #      - name: Run unit tests
