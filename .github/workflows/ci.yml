@@ -2,7 +2,7 @@ name: Continuous Integration (Build, Test, Lint)
 
 env:
   CI: true
-  SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+  SLACK_BOT_TOKEN: ${{ vars.SLACK_BOT_TOKEN }}
   SLACK_CHANNEL: '#ci-failures'
   REPO_NAME: ${{ github.repository }}
   REPO_URL: ${{ github.event.repository.html_url }}
@@ -40,6 +40,7 @@ jobs:
           
       - name: verify works in next step
         run: |
+          echo ${{ github.event.pull_request.head }}
           echo ${{ steps.slack-message.outputs.message-issue-build }}
           echo ${{ steps.slack-message.outputs.message-issue-test }}
           echo ${{ steps.slack-message.outputs.message-issue-quality }}
