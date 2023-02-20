@@ -3,7 +3,7 @@ name: Continuous Integration (Build, Test, Lint)
 env:
   CI: true
   SLACK_BOT_TOKEN: ${{ vars.SLACK_BOT_TOKEN }}
-  SLACK_CHANNEL: '#ci-failures'
+  SLACK_CHANNEL: 'ci-failures'
   REPO_NAME: ${{ github.repository }}
   REPO_URL: ${{ github.event.repository.html_url }}
   PULL_REQUEST_URL: ${{ github.event.pull_request.html_url }}
@@ -31,7 +31,7 @@ jobs:
             Repository: $REPO_NAME\n \
             Source Branch: $SOURCE_BRANCH\n \
             Target Branch: $TARGET_BRANCH\n \
-            Reason: $1 \"}"
+            Reason: $1\" }"
             echo $message
           }
           echo "message-issue-build=$(generate_message "Build failed")" >> $GITHUB_OUTPUT
