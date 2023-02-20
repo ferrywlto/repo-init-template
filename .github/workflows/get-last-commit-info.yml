@@ -29,7 +29,7 @@ jobs:
 
       - name: Get commit author name and email
         run: |
-          author="${GITHUB_EVENT['head_commit']['author']['name']} <${GITHUB_EVENT['head_commit']['author']['email']}>"
+          author="${GITHUB_EVENT.head_commit.author.name} <${GITHUB_EVENT.head_commit.author.email}>"
           author_name="${{ github.event.head_commit.author.name }}"
           author_email="${{ github.event.head_commit.author.email }}"
           commit_sha="${{ github.sha }}"
