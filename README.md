@@ -1,1 +1,1 @@
-abasa
+asa
