@@ -58,15 +58,15 @@ jobs:
       - name: Setup message function
         id: generate-endpoint
         run: |
-          - function generate() {
-              local message="${{ env.API_URL }}/$1/protection"
-              echo $message
-            }
-            echo "branch-protection-main=$(generate "main")" >> $GITHUB_OUTPUT
-            echo "branch-protection-development=$(generate "development")" >> $GITHUB_OUTPUT
-            echo "branch-protection-staging=$(generate "staging")" >> $GITHUB_OUTPUT
-            echo "branch-protection-production=$(generate "production")" >> $GITHUB_OUTPUT
-            echo "branch-protection-release=$(generate "release%2F%5B0-9%5D*.%5B0-9%5D*.%5B0-9%5D*")" >> $GITHUB_OUTPUT
+          function generate() {
+            local message="${{ env.API_URL }}/$1/protection"
+            echo $message
+          }
+          echo "branch-protection-main=$(generate "main")" >> $GITHUB_OUTPUT
+          echo "branch-protection-development=$(generate "development")" >> $GITHUB_OUTPUT
+          echo "branch-protection-staging=$(generate "staging")" >> $GITHUB_OUTPUT
+          echo "branch-protection-production=$(generate "production")" >> $GITHUB_OUTPUT
+          echo "branch-protection-release=$(generate "release%2F%5B0-9%5D*.%5B0-9%5D*.%5B0-9%5D*")" >> $GITHUB_OUTPUT
           
       - name: Setup Git
         uses: actions/checkout@v3
