@@ -84,8 +84,6 @@ jobs:
 
       - name: Create branch protection (main)
         run: |
-          echo ${{ env.TEST_URL }}
-          echo ${{ env.STRICT_RULE }}
           curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '${{ env.STRICT_RULE }}' \
           ${{ steps.generate-endpoint.outputs.branch-protection-main }}
 
