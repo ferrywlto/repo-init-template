@@ -12,8 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       API_URL: "https://api.github.com/repos/${{github.repository}}/branches"
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      AUTH_HEADER: "Authorization: token ${{ secrets.GITHUB_TOKEN }}"
+      AUTH_HEADER: "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"
       ACCEPT_HEADER: "Accept: application/vnd.github.v3+json"
       STRICT_RULE: |
         {
