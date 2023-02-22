@@ -5,7 +5,7 @@ on:
   create:
     types: repository
 
-permissions: read-all | write-all
+permissions: write-all
 
 jobs:
   create-repo:
