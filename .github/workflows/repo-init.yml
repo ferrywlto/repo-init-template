@@ -9,10 +9,8 @@ jobs:
   create-repo:
     runs-on: ubuntu-latest
     env:
-      TEST_URL: "https://api.github.com/repos/${{github.repository_owner}}/${{github.repository}}/branches/main/protection"
+      API_URL: "https://api.github.com/repos/${{github.repository_owner}}/${{github.repository}}/branches/"
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#      REPO_NAME: ${{ github.repository }}
-#      REPO_OWNER: ${{ github.repository_owner }}
       AUTH_HEADER: "Authorization: token ${{ secrets.GITHUB_TOKEN }}"
       ACCEPT_HEADER: "Accept: application/vnd.github.v3+json"
       STRICT_RULE: |
@@ -57,6 +55,19 @@ jobs:
           },
         }
     steps:
+      - name: Setup message function
+        id: generate-endpoint
+        run: |
+          - function generate() {
+              local message="${{ env.API_URL }}/$1/protection"
+              echo $message
+            }
+            echo "branch-protection-main=$(generate "main")" >> $GITHUB_OUTPUT
+            echo "branch-protection-development=$(generate "development")" >> $GITHUB_OUTPUT
+            echo "branch-protection-staging=$(generate "staging")" >> $GITHUB_OUTPUT
+            echo "branch-protection-production=$(generate "production")" >> $GITHUB_OUTPUT
+            echo "branch-protection-release=$(generate "release%2F%5B0-9%5D*.%5B0-9%5D*.%5B0-9%5D*")" >> $GITHUB_OUTPUT
+          
       - name: Setup Git
         uses: actions/checkout@v3
         with:
@@ -75,25 +86,25 @@ jobs:
         run: |
           echo ${{ env.TEST_URL }}
           echo ${{ env.STRICT_RULE }}
-          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$STRICT_RULE' \
-          https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/branches/main/protection
+          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '${{ env.STRICT_RULE }}' \
+          ${{ steps.generate-endpoint.outputs.branch-protection-main }}
 
       - name: Create branch protection (staging)
         run: |
           curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$STRICT_RULE' \
-          https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/branches/staging/protection
+          ${{ steps.generate-endpoint.outputs.branch-protection-staging }}
 
       - name: Create branch protection (production)
         run: |
           curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$STRICT_RULE' \
-          https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/branches/production/protection
+          ${{ steps.generate-endpoint.outputs.branch-protection-production }}
 
       - name: Create branch protection (development)
         run: |
           curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$LOOSE_RULE' \
-          https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/branches/development/protection
+          ${{ steps.generate-endpoint.outputs.branch-protection-development }}
 
       - name: Create branch protection (release/[0-9]*.[0-9]*.[0-9]*)
         run: |
           curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$LOOSE_RULE' \
-          https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/branches/release%2F%5B0-9%5D*.%5B0-9%5D*.%5B0-9%5D*/protection
+          ${{ steps.generate-endpoint.outputs.branch-protection-release }}
