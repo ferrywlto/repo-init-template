@@ -5,6 +5,8 @@ on:
   create:
     types: repository
 
+permissions: write-all
+
 jobs:
   create-repo:
     runs-on: ubuntu-latest
@@ -55,18 +57,31 @@ jobs:
           },
         }
     steps:
-      - name: Setup message function
-        id: generate-endpoint
+      - name: Setup message urls
+        id: generate-endpoint-protection
         run: |
-          function generate() {
+          function generate_url() {
             local message="${{ env.API_URL }}/$1/protection"
             echo $message
           }
-          echo "branch-protection-main=$(generate "main")" >> $GITHUB_OUTPUT
-          echo "branch-protection-development=$(generate "development")" >> $GITHUB_OUTPUT
-          echo "branch-protection-staging=$(generate "staging")" >> $GITHUB_OUTPUT
-          echo "branch-protection-production=$(generate "production")" >> $GITHUB_OUTPUT
-          echo "branch-protection-release=$(generate "release%2F%5B0-9%5D*.%5B0-9%5D*.%5B0-9%5D*")" >> $GITHUB_OUTPUT
+          echo "url-protection-main=$(generate_url "main")" >> $GITHUB_OUTPUT
+          echo "url-protection-development=$(generate_url "development")" >> $GITHUB_OUTPUT
+          echo "url-protection-staging=$(generate_url "staging")" >> $GITHUB_OUTPUT
+          echo "url-protection-production=$(generate_url "production")" >> $GITHUB_OUTPUT
+          echo "url-protection-release=$(generate_url "release%2F%5B0-9%5D*.%5B0-9%5D*.%5B0-9%5D*")" >> $GITHUB_OUTPUT
+      
+      - name: Setup permission urls
+        id: generate-endpoint-permission
+        run: |
+          function generate_url() {
+            local message="${{ env.API_URL }}/$1/protection"
+            echo $message
+          }
+          echo "url-permission-manager=$(generate_url "merge-managers")" >> $GITHUB_OUTPUT
+          echo "url-permission-developer=$(generate_url "development-team")" >> $GITHUB_OUTPUT
+          echo "url-permission-devops=$(generate_url "devops-team")" >> $GITHUB_OUTPUT
+          echo "url-permission-qa=$(generate_url "qa-team")" >> $GITHUB_OUTPUT
+          echo "url-permission-admin=$(generate_url "wati-admin")" >> $GITHUB_OUTPUT
           
       - name: Setup Git
         uses: actions/checkout@v3
@@ -85,24 +100,49 @@ jobs:
       - name: Create branch protection (main)
         run: |
           curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '${{ env.STRICT_RULE }}' \
-          ${{ steps.generate-endpoint.outputs.branch-protection-main }}
+          ${{ steps.generate-endpoint-protection.outputs.url-protection-main }}
 
       - name: Create branch protection (staging)
         run: |
           curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$STRICT_RULE' \
-          ${{ steps.generate-endpoint.outputs.branch-protection-staging }}
+          ${{ steps.generate-endpoint-protection.outputs.url-protection-staging }}
 
       - name: Create branch protection (production)
         run: |
           curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$STRICT_RULE' \
-          ${{ steps.generate-endpoint.outputs.branch-protection-production }}
+          ${{ steps.generate-endpoint-protection.outputs.url-protection-production }}
 
       - name: Create branch protection (development)
         run: |
           curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$LOOSE_RULE' \
-          ${{ steps.generate-endpoint.outputs.branch-protection-development }}
+          ${{ steps.generate-endpoint-protection.outputs.url-protection-development }}
 
       - name: Create branch protection (release/[0-9]*.[0-9]*.[0-9]*)
         run: |
           curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$LOOSE_RULE' \
-          ${{ steps.generate-endpoint.outputs.branch-protection-release }}
+          ${{ steps.generate-endpoint-protection.outputs.url-protection-release }}
+
+      - name: Create default user permissions (Admins)
+        run: |
+          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '{"permission": "admin"}' \
+          ${{ steps.generate-endpoint-permission.outputs.url-permission-admin }}
+      
+      - name: Create default user permissions (Merge Manager)
+        run: |
+          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '{"permission": "maintain"}' \
+          ${{ steps.generate-endpoint-permission.outputs.url-permission-manager }}
+          
+      - name: Create default user permissions (Developer))
+        run: |
+          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '{"permission": "write"}' \
+          ${{ steps.generate-endpoint-permission.outputs.url-permission-developer }}
+          
+      - name: Create default user permissions (DevOps)
+        run: |
+          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '{"permission": "read"}' \
+          ${{ steps.generate-endpoint-permission.outputs.url-permission-devops }}
+          
+      - name: Create default user permissions (QA)
+        run: |
+          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '{"permission": "read"}' \
+          ${{ steps.generate-endpoint-permission.outputs.url-permission-qa }}
