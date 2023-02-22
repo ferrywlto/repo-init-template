@@ -5,18 +5,16 @@ on:
   create:
     types: repository
 
-env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  REPO_NAME: ${{ github.repository }}
-  REPO_OWNER: ${{ github.repository_owner }}
-  AUTH_HEADER: "Authorization: token ${{ secrets.GITHUB_TOKEN }}"
-  ACCEPT_HEADER: "Accept: application/vnd.github.v3+json"
-
 jobs:
   create-repo:
     runs-on: ubuntu-latest
     env:
-      TEST_URL: "https://api.github.com/repos/${{env.REPO_OWNER}}/${{env.REPO_NAME}}/branches/main/protection"
+      TEST_URL: "https://api.github.com/repos/${{github.repository_owner}}/${{github.repository}}/branches/main/protection"
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      REPO_NAME: ${{ github.repository }}
+#      REPO_OWNER: ${{ github.repository_owner }}
+      AUTH_HEADER: "Authorization: token ${{ secrets.GITHUB_TOKEN }}"
+      ACCEPT_HEADER: "Accept: application/vnd.github.v3+json"
       STRICT_RULE: |
         {
           "required_pull_request_reviews": {
