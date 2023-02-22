@@ -19,23 +19,17 @@ jobs:
           "required_pull_request_reviews": {
               "required_approving_review_count": 2,
               "dismissal_restrictions": {
-                  "users": [],
-                  "teams": [],
+                  "teams": ["merge-managers"],
                   "teams_strict": true
               }
           },
           "required_status_checks": {
               "strict": true,
-              "contexts": [
-                  "continuous-integration"
-              ]
+              "contexts": ["continuous-integration"]
           },
           "enforce_admins": true,
           "restrictions": {
-              "users": [],
-              "teams": [
-                  "merge-managers"
-              ],
+              "teams": ["merge-managers"],
               "teams_strict": true
           },
           "allow_squash_merge": true,
@@ -47,23 +41,17 @@ jobs:
           "required_pull_request_reviews": {
               "required_approving_review_count": 1,
               "dismissal_restrictions": {
-                  "users": [],
-                  "teams": [],
+                  "teams": ["merge-managers"],
                   "teams_strict": true
               }
           },
           "required_status_checks": {
               "strict": true,
-              "contexts": [
-                  "continuous-integration"
-              ]
+              "contexts": ["continuous-integration"]
           },
           "enforce_admins": true,
           "restrictions": {
-              "users": [],
-              "teams": [
-                  "merge-managers"
-              ],
+              "teams": ["merge-managers"],
               "teams_strict": true
           },
         }
@@ -84,25 +72,25 @@ jobs:
 
       - name: Create branch protection (main)
         run: |
-          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER -d $STRICT_RULE \
+          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$STRICT_RULE' \
           https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/branches/main/protection
 
       - name: Create branch protection (staging)
         run: |
-          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER -d $STRICT_RULE \
+          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$STRICT_RULE' \
           https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/branches/staging/protection
 
       - name: Create branch protection (production)
         run: |
-          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER -d $STRICT_RULE \
+          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$STRICT_RULE' \
           https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/branches/production/protection
 
       - name: Create branch protection (development)
         run: |
-          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER -d $LOOSE_RULE \
+          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$LOOSE_RULE' \
           https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/branches/development/protection
 
       - name: Create branch protection (release/[0-9]*.[0-9]*.[0-9]*)
         run: |
-          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER -d $LOOSE_RULE \
+          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$LOOSE_RULE' \
           https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/branches/release%2F%5B0-9%5D*.%5B0-9%5D*.%5B0-9%5D*/protection
