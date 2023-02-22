@@ -99,50 +99,50 @@ jobs:
 
       - name: Create branch protection (main)
         run: |
-          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '${{ env.STRICT_RULE }}' \
-          ${{ steps.generate-endpoint-protection.outputs.url-protection-main }}
+          curl -X PUT ${{ steps.generate-endpoint-protection.outputs.url-protection-main }} \
+          -H ${{ env.AUTH_HEADER }} -H ${{ env.ACCEPT_HEADER }} --data-raw '${{ env.STRICT_RULE }}'
 
       - name: Create branch protection (staging)
         run: |
-          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$STRICT_RULE' \
-          ${{ steps.generate-endpoint-protection.outputs.url-protection-staging }}
+          curl -X PUT ${{ steps.generate-endpoint-protection.outputs.url-protection-staging }} \
+          -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$STRICT_RULE'
 
       - name: Create branch protection (production)
         run: |
-          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$STRICT_RULE' \
-          ${{ steps.generate-endpoint-protection.outputs.url-protection-production }}
+          curl -X PUT ${{ steps.generate-endpoint-protection.outputs.url-protection-production }} \
+          -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$STRICT_RULE' \
 
       - name: Create branch protection (development)
         run: |
-          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$LOOSE_RULE' \
-          ${{ steps.generate-endpoint-protection.outputs.url-protection-development }}
+          curl -X PUT ${{ steps.generate-endpoint-protection.outputs.url-protection-development }} \
+          -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$LOOSE_RULE' \
 
       - name: Create branch protection (release/[0-9]*.[0-9]*.[0-9]*)
         run: |
-          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$LOOSE_RULE' \
-          ${{ steps.generate-endpoint-protection.outputs.url-protection-release }}
+          curl -X PUT ${{ steps.generate-endpoint-protection.outputs.url-protection-release }} \
+          -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$LOOSE_RULE' 
 
       - name: Create default user permissions (Admins)
         run: |
-          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '{"permission": "admin"}' \
-          ${{ steps.generate-endpoint-permission.outputs.url-permission-admin }}
+          curl -X PUT ${{ steps.generate-endpoint-permission.outputs.url-permission-admin }} \
+          -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '{"permission": "admin"}'          
       
       - name: Create default user permissions (Merge Manager)
         run: |
-          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '{"permission": "maintain"}' \
-          ${{ steps.generate-endpoint-permission.outputs.url-permission-manager }}
+          curl -X PUT ${{ steps.generate-endpoint-permission.outputs.url-permission-manager }} \
+          -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '{"permission": "maintain"}'
           
       - name: Create default user permissions (Developer))
         run: |
-          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '{"permission": "write"}' \
-          ${{ steps.generate-endpoint-permission.outputs.url-permission-developer }}
+          curl -X PUT ${{ steps.generate-endpoint-permission.outputs.url-permission-developer }} \
+          -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '{"permission": "write"}'
           
       - name: Create default user permissions (DevOps)
         run: |
-          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '{"permission": "read"}' \
-          ${{ steps.generate-endpoint-permission.outputs.url-permission-devops }}
+          curl -X PUT ${{ steps.generate-endpoint-permission.outputs.url-permission-devops }} \
+          -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '{"permission": "read"}'
           
       - name: Create default user permissions (QA)
         run: |
-          curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '{"permission": "read"}' \
-          ${{ steps.generate-endpoint-permission.outputs.url-permission-qa }}
+          curl -X PUT ${{ steps.generate-endpoint-permission.outputs.url-permission-qa }} \
+          -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '{"permission": "read"}'
