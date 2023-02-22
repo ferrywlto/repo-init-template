@@ -5,8 +5,6 @@ on:
   create:
     types: repository
 
-permissions: write-all
-
 jobs:
   create-repo:
     runs-on: ubuntu-latest
