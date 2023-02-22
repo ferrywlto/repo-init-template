@@ -12,7 +12,7 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       REPO_NAME: ${{ github.repository }}
       REPO_OWNER: ${{ github.repository_owner }}
-      TEST_URL: "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/branches/main/protection"
+      TEST_URL: "https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/branches/main/protection"
       AUTH_HEADER: "Authorization: token ${{ secrets.GITHUB_TOKEN }}"
       ACCEPT_HEADER: "Accept: application/vnd.github.v3+json"
       STRICT_RULE: |
@@ -74,7 +74,8 @@ jobs:
       - name: Create branch protection (main)
         run: |
           echo $TEST_URL
-          echo '$STRICT_RULE'
+          echo '${STRICT_RULE}'
+          echo ${{ env.STRICT_RULE }}
           curl -X PUT -H $AUTH_HEADER -H $ACCEPT_HEADER --data-raw '$STRICT_RULE' \
           https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/branches/main/protection
 
